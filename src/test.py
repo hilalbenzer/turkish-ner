@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
 from sklearn.externals import joblib
-import numpy as np
+from sklearn.metrics import f1_score
+import Util
 
 model = joblib.load('model.pkl')
 
 tempMap = {}
 dicMap = {}
-allRecognitions = []
-outputsAsLine = []
-lineCounter = 0
+actual_class = []
+found_class = []
+
 with open('dictionary.txt','r',encoding="utf-8") as file:
 	for line in file:
 		tempMap = { line.split()[0]:line.split()[1] }
@@ -26,79 +27,39 @@ def findClass(quintet):
 		if(output == 1):
 			return str(12-i)
 
-def createQuintet(window):
-	window0 = np.zeros((dicLength,), dtype=int)
-	window1 = np.zeros((dicLength,), dtype=int)
-	window2 = np.zeros((dicLength,), dtype=int)
-	window3 = np.zeros((dicLength,), dtype=int)
-	window4 = np.zeros((dicLength,), dtype=int)
-	if window[0] in dicMap:
-		window0[int(dicMap.get(window[0]))] = 1
-	else:
-		window0[dicLength-1] = 1
-	if window[1] in dicMap:
-		window1[int(dicMap.get(window[1]))] = 1
-	else:
-		window1[dicLength-1] = 1
-	if window[2] in dicMap:
-		window2[int(dicMap.get(window[2]))] = 1
-	else:
-		window2[dicLength-1] = 1
-	if window[3] in dicMap:
-		window3[int(dicMap.get(window[3]))] = 1
-	else:
-		window3[dicLength-1] = 1
-	if window[4] in dicMap:
-		window4[int(dicMap.get(window[4]))] = 1
-	else:
-		window4[dicLength-1] = 1
-	quintet = window0 + window1 + window2 + window3 + window4
-		
-	return quintet
-
-
-def nameClass(rec):
-	if rec == "12":
-		return "O"
-	elif rec == "0":
-		return "B-ORG"
-	elif rec=="1":
-		return "I-ORG"
-	elif rec=="2":
-		return "I-ORG"
-	elif rec=="3":
-		return "B-ORG"
-	elif rec=="4":
-		return "B-LOC"
-	elif rec=="5":
-		return "I-LOC"
-	elif rec=="6":
-		return "I-LOC"
-	elif rec=="7":
-		return "B-LOC"
-	elif rec=="8":
-		return "B-PER"
-	elif rec=="9":
-		return "I-PER"
-	elif rec=="10":
-		return "I-PER"
-	elif rec=="11":
-		return "B-PER"
-
-
 with open('reyyan.test.txt','r',encoding='utf-8',errors="ignore") as f:
-	for line in f:
-		lineCounter = lineCounter + 1
-		print("Line: " + str(lineCounter))
-		counter=0
-		tokens = line.split();
-		while '[ORG' in tokens: tokens.remove('[ORG')
-		while '[PER' in tokens: tokens.remove('[PER')
-		while '[LOC' in tokens: tokens.remove('[LOC')
-		while ']' in tokens: tokens.remove(']')
-
+	for line_count, line in enumerate(f):
+		print("Line: " + str(line_count))
+		tokens = line.split()
+		current_entity_type = ""
 		for token_number, token in enumerate(tokens):
-			print(str(token_number) + "/" + str(len(tokens)))
+
+			current_position = "O"
+			if current_entity_type == "":
+				if token == "[LOC":
+					current_entity_type = "LOC"
+					continue
+				elif token == "[ORG":
+					current_entity_type = "ORG"
+					continue
+				elif token == "[PER":
+					current_entity_type = "PER"
+					continue
+			elif token == "]":
+				current_entity_type = ""
+				continue
+			else:
+				if tokens[token_number - 1] == "[LOC" or tokens[token_number - 1] == "[PER" or tokens[token_number - 1] == "[ORG":
+					if tokens[token_number + 1] == "]":
+						current_position = "U"
+					else:
+						current_position = "B"
+				elif tokens[token_number + 1] == "]":
+					current_position = "L"
+				else:
+					current_position = "I"
+
+			actual_class.append(str(Util.find_recognition(current_entity_type, current_position)))
 
 			window = ["", "", "", "", ""]
 			count = 1
@@ -121,34 +82,25 @@ with open('reyyan.test.txt','r',encoding='utf-8',errors="ignore") as f:
 
 			window[2] = token
 
-			classFound = findClass(createQuintet(window))
-			allRecognitions.append(nameClass(classFound))
-			counter = counter+1
+			classFound = findClass(Util.create_quintet(window, dicMap))
+			found_class.append(classFound)
 
-counter = 0
 success = 0
 failure = 0
-with open('recognitionsExpected.txt','r',encoding='utf-8',errors="ignore") as f:
-	for line in f:
-		if counter < len(allRecognitions):
-			word = line.split()[0]
-			if str(word) == str(allRecognitions[counter]):
-				success += 1
-			else:
-				failure += 1
-			counter = counter + 1
+for index, current in enumerate(found_class):
+	if str(actual_class[index]) == str(current):
+		success += 1
+	else:
+		failure += 1
 
 print("Success: " + str(success))
 print("Failure: " + str(failure))
 
 print("Success rate: " + str((success/(success + failure)) * 100))
 
-"""with open('results.txt','w',encoding='utf-8',errors="ignore") as file:
-	for current in allRecognitions:
-		file.write(current)
-		file.write("\n")"""
 
-
+print("Macro average: " + str(f1_score(actual_class, found_class, average='macro')))
+print("Micro average: " + str(f1_score(actual_class, found_class, average='micro')))
 
 
 
