@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
 from sklearn.externals import joblib
-from sklearn.metrics import f1_score
+from sklearn.metrics import classification_report
 import Util
 
 model = joblib.load('model.pkl')
@@ -98,9 +98,9 @@ print("Failure: " + str(failure))
 
 print("Success rate: " + str((success/(success + failure)) * 100))
 
+target_names = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
 
-print("Macro average: " + str(f1_score(actual_class, found_class, average='macro')))
-print("Micro average: " + str(f1_score(actual_class, found_class, average='micro')))
+print(classification_report(actual_class, found_class, target_names=target_names))
 
 
 
