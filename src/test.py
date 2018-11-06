@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*- 
 from sklearn.externals import joblib
 from sklearn.metrics import classification_report
+from conlleval import evaluate
 import Util
 
 model = joblib.load('model.pkl')
@@ -23,7 +24,7 @@ def findClass(quintet):
 	aBatch=[]
 	aBatch.append(quintet)
 	for i in range(13):
-		output=model.score(aBatch,[12-i])
+		output = model.score(aBatch,[12-i])
 		if(output == 1):
 			return str(12-i)
 
@@ -59,7 +60,7 @@ with open('reyyan.test.txt','r',encoding='utf-8',errors="ignore") as f:
 				else:
 					current_position = "I"
 
-			actual_class.append(str(Util.find_recognition(current_entity_type, current_position)))
+			actual_class.append(Util.find_full_recognition(current_entity_type, current_position))
 
 			window = ["", "", "", "", ""]
 			count = 1
@@ -83,7 +84,7 @@ with open('reyyan.test.txt','r',encoding='utf-8',errors="ignore") as f:
 			window[2] = token
 
 			classFound = findClass(Util.create_quintet(window, dicMap))
-			found_class.append(classFound)
+			found_class.append(Util.find_recognition_string(classFound))
 
 success = 0
 failure = 0
@@ -98,9 +99,38 @@ print("Failure: " + str(failure))
 
 print("Success rate: " + str((success/(success + failure)) * 100))
 
-target_names = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+target_names = ['O', 'B-ORG', 'I-ORG', 'L-ORG', 'U-ORG', 'B-LOC', 'I-LOC', 'L-LOC', 'U-LOC', 'B-PER', 'I-PER', 'L-PER', 'U-PER']
+#target_names = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
 
 print(classification_report(actual_class, found_class, target_names=target_names))
+
+# calculate overall metrics
+prec, rec, f1 = evaluate(actual_class, found_class, verbose=True)
+
+print ("Precision: " + str(prec))
+print ("Recall: " + str(rec))
+print ("F1: " + str(f1))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

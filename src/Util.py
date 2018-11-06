@@ -63,33 +63,39 @@ def find_recognition(rec, pos):
 	else:
 		return 12
 
+def find_full_recognition(rec, pos):
+	if pos == "O":
+		return "O"
+	else:
+		return pos + "-" + rec
+
 def find_recognition_string(rec):
 	if rec == "12":
 		return "O"
 	elif rec == "0":
 		return "B-ORG"
-	elif rec=="1":
+	elif rec == "1":
 		return "I-ORG"
-	elif rec=="2":
-		return "I-ORG"
-	elif rec=="3":
-		return "B-ORG"
-	elif rec=="4":
+	elif rec == "2":
+		return "L-ORG"
+	elif rec == "3":
+		return "U-ORG"
+	elif rec == "4":
 		return "B-LOC"
-	elif rec=="5":
+	elif rec == "5":
 		return "I-LOC"
-	elif rec=="6":
-		return "I-LOC"
-	elif rec=="7":
-		return "B-LOC"
-	elif rec=="8":
+	elif rec == "6":
+		return "L-LOC"
+	elif rec == "7":
+		return "U-LOC"
+	elif rec == "8":
 		return "B-PER"
-	elif rec=="9":
+	elif rec == "9":
 		return "I-PER"
-	elif rec=="10":
-		return "I-PER"
-	elif rec=="11":
-		return "B-PER"
+	elif rec == "10":
+		return "L-PER"
+	elif rec == "11":
+		return "U-PER"
 
 def check_valid_token(token):
 	if token == "[LOC":
