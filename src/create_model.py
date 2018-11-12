@@ -27,7 +27,7 @@ with open('reyyan.train.txt','r',encoding="utf-8",errors="ignore") as f:
 		tokens = line.split()
 		current_entity_type = ""
 		for token_number, token in enumerate(tokens):
-			print(str(token_number) + "/" + str(len(tokens)))
+			#print(str(token_number) + "/" + str(len(tokens)))
 
 			current_position = "O"
 			if current_entity_type == "":
@@ -57,30 +57,10 @@ with open('reyyan.train.txt','r',encoding="utf-8",errors="ignore") as f:
 			recognition_array.append(Util.find_recognition(current_entity_type, current_position))
 			#print (token + " " + current_position + " (" + current_entity_type + ")")
 
-			window = ["", "", "", "", ""]
-			count = 1
-			window_count = 0
-			tokens_length = len(tokens)
-			while window_count < 2:
-				if token_number - count < 0:
-					break
-				if Util.check_valid_token(tokens[token_number - count]):
-					window[1-window_count] = tokens[token_number - count]
-					window_count += 1
-				count += 1
-			count = 1
-			window_count = 0
-			while window_count < 2:
-				if token_number + count > tokens_length - 1:
-					break
-				if Util.check_valid_token(tokens[token_number + count]):
-					window[3+window_count] = tokens[token_number + count]
-					window_count += 1
-				count += 1
-
-			window[2] = token
-			feature_vector.append(Util.create_quintet(window, dicMap))
-			#print (token + " " + str(window))
+			window = Util.create_window(token_number, tokens)
+			
+			quintet = Util.create_quintet(window, dicMap)
+			feature_vector.append(quintet)
 
 		if line_count % 100 == 0:
 			model = model.partial_fit(feature_vector, recognition_array, classes)
@@ -89,6 +69,7 @@ with open('reyyan.train.txt','r',encoding="utf-8",errors="ignore") as f:
 			batch_count += 1
 			recognition_array = []
 			feature_vector = []	
+	#model = model.fit(feature_vector, recognition_array, classes)
 	joblib.dump(model, 'model.pkl')
 
 	

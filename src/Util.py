@@ -1,6 +1,26 @@
 import numpy as np
 
+def get_dict_lookup(word, dictionary):
+	dic_length = len(dictionary) + 1
+	#vector = np.zeros((dic_length,), dtype=int)
+	vector = [0] * dic_length
+	if word in dictionary:
+		vector[int(dictionary.get(word))] = 1
+	else:
+		vector[dic_length-1] = 1
+	return vector
+
+def get_feature_vector(word, dictionary):
+	dict_feature = get_dict_lookup(word, dictionary)
+	return dict_feature
+
+
+
 def create_quintet(window, dictionary):
+	quintet = []
+	#for word in window:
+	#	quintet += get_dict_lookup(word, dictionary)
+
 	dic_length = len(dictionary) + 1
 	window0 = np.zeros((dic_length,), dtype=int)
 	window1 = np.zeros((dic_length,), dtype=int)
@@ -28,9 +48,49 @@ def create_quintet(window, dictionary):
 	else:
 		window4[dic_length-1] = 1
 	quintet = window0 + window1 + window2 + window3 + window4
+
 		
 	return quintet
 
+def create_window(token_number, tokens):
+	window = ["", "", "", "", ""]
+	count = 1
+	window_count = 0
+	tokens_length = len(tokens)
+	while window_count < 2:
+		if token_number - count < 0:
+			if token_number - count == -1:
+				if token_number == 0:
+					window[1] = "<SEN-1>"
+				elif token_number == 1:
+					window[0] = "<SEN-1>"
+			elif token_number - count == -2:
+				if token_number == 0:
+					window[0] = "<SEN-2>"
+		elif check_valid_token(tokens[token_number - count]):
+			window[1-window_count] = tokens[token_number - count]
+		window_count += 1	
+		count += 1
+	count = 1
+	window_count = 0
+	while window_count < 2:
+		if token_number + count > tokens_length - 1:
+			if token_number + count == tokens_length:
+				if token_number == tokens_length - 1:
+					window[3] = "<SEN+1>"
+				elif token_number == tokens_length - 2:
+					window[4] = "<SEN+1>"
+			elif token_number + count == tokens_length + 1:
+				if token_number == tokens_length - 1:
+					window[4] = "<SEN+2>"
+		elif check_valid_token(tokens[token_number + count]):
+			window[3+window_count] = tokens[token_number + count]
+		window_count += 1	
+		count += 1
+
+	window[2] = tokens[token_number]
+
+	return window
 
 def find_recognition(rec, pos):
 	if rec == "ORG":

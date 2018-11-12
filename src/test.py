@@ -62,26 +62,7 @@ with open('reyyan.test.txt','r',encoding='utf-8',errors="ignore") as f:
 
 			actual_class.append(Util.find_full_recognition(current_entity_type, current_position))
 
-			window = ["", "", "", "", ""]
-			count = 1
-			window_count = 0
-			tokens_length = len(tokens)
-			while window_count < 2:
-				if token_number - count < 0:
-					break
-				window[1-window_count] = tokens[token_number - count]
-				window_count += 1	
-				count += 1
-			count = 1
-			window_count = 0
-			while window_count < 2:
-				if token_number + count > tokens_length - 1:
-					break
-				window[3+window_count] = tokens[token_number + count]
-				window_count += 1	
-				count += 1
-
-			window[2] = token
+			window = Util.create_window(token_number, tokens)
 
 			classFound = findClass(Util.create_quintet(window, dicMap))
 			found_class.append(Util.find_recognition_string(classFound))
