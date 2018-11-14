@@ -12,7 +12,6 @@ dicMap = Util.read_dictionary_from_file('dictionary.txt')
 actual_class = []
 found_class = []
 
-	for line in file:
 def find_class(quintet):
 	aBatch=[]
 	aBatch.append(quintet)
