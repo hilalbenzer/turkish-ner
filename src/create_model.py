@@ -51,7 +51,7 @@ with open('reyyan.train.txt','r',encoding="utf-8",errors="ignore") as f:
 
 			feature_vector.append(quintet)
 
-		if line_count % 100 == 0:
+		if line_count % 100 == 0 and line_count != 0:
 			model = model.partial_fit(feature_vector, recognition_array, classes)
 			batch_count += 1
 			recognition_array = []

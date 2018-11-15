@@ -24,17 +24,7 @@ def get_feature_vector(word, dictionary):
 	return dict_feature
 
 def create_quintet(window, dictionary):
-	quintet = []
-	#quintet = np.concatenate([get_feature_vector(word, dictionary) for word in window])
-
-	vector0 = get_feature_vector(window[0], dictionary)
-	vector1 = get_feature_vector(window[1], dictionary)
-	vector2 = get_feature_vector(window[2], dictionary)
-	vector3 = get_feature_vector(window[3], dictionary)
-	vector4 = get_feature_vector(window[4], dictionary)
-
-	quintet = vector0 + vector1 + vector2 + vector3 + vector4
-		
+	quintet = np.concatenate([get_feature_vector(word, dictionary) for word in window])		
 	return quintet
 
 def create_window(token_number, tokens):
