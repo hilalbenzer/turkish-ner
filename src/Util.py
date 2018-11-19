@@ -19,9 +19,26 @@ def get_dict_lookup(word, dictionary):
 		vector[dic_length-1] = 1
 	return vector
 
+def get_capitalization(word):
+	if word.islower():
+		return 0
+	elif word.istitle():
+		return 1
+	elif word.isupper():
+		return 2
+	else:
+		return 3
+
+def replace_digit(word):
+	return "".join(["#" if char.isdigit() else char for char in word])
+
+
 def get_feature_vector(word, dictionary):
+	word = replace_digit(word)
+	capitalization_feature = [get_capitalization(word)]
 	dict_feature = get_dict_lookup(word, dictionary)
-	return dict_feature
+	total_feature = np.concatenate((dict_feature, capitalization_feature))
+	return total_feature
 
 def create_quintet(window, dictionary):
 	quintet = np.concatenate([get_feature_vector(word, dictionary) for word in window])		

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
 from gensim.corpora import Dictionary
+import Util
 
 dictionary = Dictionary() 
 
@@ -11,11 +12,9 @@ with open('reyyan.train.txt', encoding="utf-8") as fp:
 		
 		"""linex = line.replace('%', ' % ')
 		linex = linex.replace('.', ' . ')
-		linex = linex.replace('\'', ' DICT_APOSTROPHE ')
-		linex = linex.replace('’', ' DICT_APOSTROPHE ')
 		linex = linex.replace('?', ' ? ')"""
 		tokens = line.split()
-		#tokens = ["DICT_NUMBER" if token.isdigit() else token for token in tokens]
+		tokens = [Util.replace_digit(word) for word in tokens]
 
 		dictionary.doc2bow(tokens, allow_update=True);
 
