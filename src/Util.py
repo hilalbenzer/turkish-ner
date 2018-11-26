@@ -1,4 +1,5 @@
 import numpy as np
+from gensim.models import KeyedVectors
 
 position_B = "B"
 position_I = "I"
@@ -10,6 +11,10 @@ entity_type_LOC = "LOC"
 entity_type_PER = "PER"
 entity_type_ORG = "ORG"
 
+unknown_words = []
+
+word2vec_model = KeyedVectors.load_word2vec_format('trmodel.dms', binary=True)
+
 def get_dict_lookup(word, dictionary):
 	dic_length = len(dictionary) + 1
 	vector = np.zeros((dic_length,), dtype=int)
@@ -18,6 +23,20 @@ def get_dict_lookup(word, dictionary):
 	else:
 		vector[dic_length-1] = 1
 	return vector
+
+# def get_capitalization(word):
+# 	if contains_apostrophe(word):
+# 		return 0
+# 	elif word.islower():
+# 		return 1
+# 	elif word.istitle():
+# 		return 2
+# 	elif word.isupper():
+# 		return 3
+# 	elif is_digit(word):
+# 		return 4
+# 	else:
+# 		return 5
 
 def get_capitalization(word):
 	if word.islower():
@@ -29,15 +48,34 @@ def get_capitalization(word):
 	else:
 		return 3
 
+def contains_apostrophe(word):
+	return "\'" in word
+
+def is_digit(word):
+	for character in word:
+		if character != '#':
+			return False
+	return True
+
+def get_word2vec(word):
+	if word in word2vec_model:
+		return word2vec_model[word]
+	unknown_words.append(word)
+	return np.zeros((400,), dtype=int)
+
+
 def replace_digit(word):
+	if check_sentence_border(word):
+		return word
 	return "".join(["#" if char.isdigit() else char for char in word])
 
 
 def get_feature_vector(word, dictionary):
 	word = replace_digit(word)
 	capitalization_feature = [get_capitalization(word)]
+	word2vec_feature = get_word2vec(word)
 	dict_feature = get_dict_lookup(word, dictionary)
-	total_feature = np.concatenate((dict_feature, capitalization_feature))
+	total_feature = np.concatenate((dict_feature, capitalization_feature, word2vec_feature))
 	return total_feature
 
 def create_quintet(window, dictionary):
@@ -198,3 +236,14 @@ def read_dictionary_from_file(filename):
 			tempMap = { line.split()[0]:line.split()[1] }
 			dicMap.update(tempMap)
 	return dicMap
+
+def check_sentence_border(word):
+	if word == '<SEN-2>' or word == '<SEN-1>' or word == '<SEN+1>' or word == '<SEN+2>':
+		return True
+	else:
+		return False
+
+def print_unknown_words():
+	with open('unknown_words.txt', 'w', encoding="utf-8", errors="ignore") as f:
+		for word in unknown_words:
+			f.write(word + "\n")
