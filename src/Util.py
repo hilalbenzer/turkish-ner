@@ -24,29 +24,29 @@ def get_dict_lookup(word, dictionary):
 		vector[dic_length-1] = 1
 	return vector
 
-# def get_capitalization(word):
-# 	if contains_apostrophe(word):
-# 		return 0
-# 	elif word.islower():
-# 		return 1
-# 	elif word.istitle():
-# 		return 2
-# 	elif word.isupper():
-# 		return 3
-# 	elif is_digit(word):
-# 		return 4
-# 	else:
-# 		return 5
-
-def get_capitalization(word):
+def get_word_type(word):
+	vector = [0, 0, 0, 0, 0]
 	if word.islower():
-		return 0
-	elif word.istitle():
-		return 1
-	elif word.isupper():
-		return 2
-	else:
-		return 3
+		vector[0] = 1
+	if word.istitle():
+		vector[1] = 1
+	if word.isupper():
+		vector[2] = 1
+	if contains_apostrophe(word):
+		vector[3] = 1
+	if is_digit(word):
+		vector[4] = 1
+	return vector
+
+# def get_capitalization(word):
+# 	if word.islower():
+# 		return 0
+# 	elif word.istitle():
+# 		return 1
+# 	elif word.isupper():
+# 		return 2
+# 	else:
+# 		return 3
 
 def contains_apostrophe(word):
 	return "\'" in word
@@ -72,7 +72,7 @@ def replace_digit(word):
 
 def get_feature_vector(word, dictionary):
 	word = replace_digit(word)
-	capitalization_feature = [get_capitalization(word)]
+	capitalization_feature = get_word_type(word)
 	word2vec_feature = get_word2vec(word)
 	dict_feature = get_dict_lookup(word, dictionary)
 	total_feature = np.concatenate((dict_feature, capitalization_feature, word2vec_feature))
