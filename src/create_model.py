@@ -58,4 +58,3 @@ with open('reyyan.train.txt','r',encoding="utf-8",errors="ignore") as f:
 			feature_vector = []	
 	joblib.dump(model, 'model.pkl')
 
-Util.print_unknown_words()

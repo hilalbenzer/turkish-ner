@@ -11,9 +11,9 @@ entity_type_LOC = "LOC"
 entity_type_PER = "PER"
 entity_type_ORG = "ORG"
 
-unknown_words = []
 
-word2vec_model = KeyedVectors.load_word2vec_format('trmodel.dms', binary=True)
+
+word2vec_model = KeyedVectors.load_word2vec_format('word2vec.model', binary=True)
 
 def get_dict_lookup(word, dictionary):
 	dic_length = len(dictionary) + 1
@@ -60,8 +60,8 @@ def is_digit(word):
 def get_word2vec(word):
 	if word in word2vec_model:
 		return word2vec_model[word]
-	unknown_words.append(word)
-	return np.zeros((400,), dtype=int)
+
+	return word2vec_model["<UNKNOWN>"]
 
 
 def replace_digit(word):
@@ -242,8 +242,3 @@ def check_sentence_border(word):
 		return True
 	else:
 		return False
-
-def print_unknown_words():
-	with open('unknown_words.txt', 'w', encoding="utf-8", errors="ignore") as f:
-		for word in unknown_words:
-			f.write(word + "\n")
