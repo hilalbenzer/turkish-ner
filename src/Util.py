@@ -11,8 +11,7 @@ entity_type_LOC = "LOC"
 entity_type_PER = "PER"
 entity_type_ORG = "ORG"
 
-
-
+print("Loading word2vec model...")
 word2vec_model = KeyedVectors.load_word2vec_format('word2vec.model', binary=True)
 
 def get_dict_lookup(word, dictionary):
@@ -38,16 +37,6 @@ def get_word_type(word):
 		vector[4] = 1
 	return vector
 
-# def get_capitalization(word):
-# 	if word.islower():
-# 		return 0
-# 	elif word.istitle():
-# 		return 1
-# 	elif word.isupper():
-# 		return 2
-# 	else:
-# 		return 3
-
 def contains_apostrophe(word):
 	return "\'" in word
 
@@ -60,22 +49,25 @@ def is_digit(word):
 def get_word2vec(word):
 	if word in word2vec_model:
 		return word2vec_model[word]
-
+	elif word.lower() in word2vec_model:
+		return word2vec_model[word.lower()]
+	elif word.upper() in word2vec_model:
+		return word2vec_model[word.upper()]
+	elif word.capitalize() in word2vec_model:
+		return word2vec_model[word.capitalize()]
 	return word2vec_model["<UNKNOWN>"]
-
 
 def replace_digit(word):
 	if check_sentence_border(word):
 		return word
 	return "".join(["#" if char.isdigit() else char for char in word])
 
-
 def get_feature_vector(word, dictionary):
 	word = replace_digit(word)
-	capitalization_feature = get_word_type(word)
+	type_feature = get_word_type(word)
 	word2vec_feature = get_word2vec(word)
 	dict_feature = get_dict_lookup(word, dictionary)
-	total_feature = np.concatenate((dict_feature, capitalization_feature, word2vec_feature))
+	total_feature = np.concatenate((dict_feature, type_feature, word2vec_feature))
 	return total_feature
 
 def create_quintet(window, dictionary):

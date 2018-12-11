@@ -11,7 +11,7 @@ dicMap = Util.read_dictionary_from_file('dictionary.txt')
 classes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12]
 batch_count = 0
 
-with open('reyyan.train.txt','r',encoding="utf-8",errors="ignore") as f:
+with open('reyyan.train.txt', 'r', encoding="utf-8", errors="ignore") as f:
 	recognition_array = []
 	feature_vector = []
 	for line_count, line in enumerate(f):
@@ -57,4 +57,3 @@ with open('reyyan.train.txt','r',encoding="utf-8",errors="ignore") as f:
 			recognition_array = []
 			feature_vector = []	
 	joblib.dump(model, 'model.pkl')
-
