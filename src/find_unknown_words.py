@@ -14,24 +14,25 @@ with open('reyyan.train.txt', 'r', encoding="utf-8", errors="ignore") as f:
 		tokens = line.split()
 		current_entity_type = ""
 		for token_number, token in enumerate(tokens):
-			if Util.is_beggining_tag(token):
+			digitless_token = Util.replace_digit(token)
+			if Util.is_beggining_tag(digitless_token):
 				continue
-			elif Util.is_ending_tag(token):
+			elif Util.is_ending_tag(digitless_token):
 				continue
-			if token in word2vec_model:
+			if digitless_token in word2vec_model:
 				known_word_count += 1
-			elif token.lower() in word2vec_model:
+			elif digitless_token.lower() in word2vec_model:
 				known_word_count += 1
-			elif token.upper() in word2vec_model:
+			elif digitless_token.upper() in word2vec_model:
 				known_word_count += 1
-			elif token.capitalize() in word2vec_model:
+			elif digitless_token.capitalize() in word2vec_model:
 				known_word_count += 1
 			else:
 				unknown_word_count += 1
-				if token in unknown_words.keys():
-					unknown_words[token] += 1
+				if digitless_token in unknown_words.keys():
+					unknown_words[digitless_token] += 1
 				else:
-					unknown_words[token] = 1
+					unknown_words[digitless_token] = 1
 
 with open('unknown_new.txt', 'w', encoding="utf-8", errors="ignore") as f:
 	unknown_words_sorted = sorted(unknown_words.items(), key=lambda kv: kv[1])
