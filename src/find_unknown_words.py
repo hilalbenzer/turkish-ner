@@ -33,7 +33,7 @@ with open('reyyan.train.txt', 'r', encoding="utf-8", errors="ignore") as f:
 				else:
 					unknown_words[token] = 1
 
-with open('unknown.txt', 'w', encoding="utf-8", errors="ignore") as f:
+with open('unknown_new.txt', 'w', encoding="utf-8", errors="ignore") as f:
 	unknown_words_sorted = sorted(unknown_words.items(), key=lambda kv: kv[1])
 	f.write("# of known words:\t" + str(known_word_count))
 	f.write("\n")
