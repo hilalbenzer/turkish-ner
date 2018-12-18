@@ -11,8 +11,8 @@ entity_type_LOC = "LOC"
 entity_type_PER = "PER"
 entity_type_ORG = "ORG"
 
-print("Loading word2vec model...")
-word2vec_model = KeyedVectors.load_word2vec_format('word2vec.model', binary=True)
+# print("Loading word2vec model...")
+# word2vec_model = KeyedVectors.load_word2vec_format('word2vec.model', binary=True)
 
 def get_dict_lookup(word, dictionary):
 	dic_length = len(dictionary) + 1
@@ -62,16 +62,17 @@ def replace_digit(word):
 		return word
 	return "".join(["#" if char.isdigit() else char for char in word])
 
-def get_feature_vector(word, dictionary):
+def get_feature_vector(word, dictionary, previous_tags):
 	word = replace_digit(word)
 	type_feature = get_word_type(word)
-	word2vec_feature = get_word2vec(word)
+	# word2vec_feature = get_word2vec(word)
 	dict_feature = get_dict_lookup(word, dictionary)
-	total_feature = np.concatenate((dict_feature, type_feature, word2vec_feature))
+	# total_feature = np.concatenate((dict_feature, type_feature, word2vec_feature))
+	total_feature = np.concatenate((dict_feature, type_feature, previous_tags))
 	return total_feature
 
-def create_quintet(window, dictionary):
-	quintet = np.concatenate([get_feature_vector(word, dictionary) for word in window])		
+def create_quintet(window, dictionary, previous_tags):
+	quintet = np.concatenate([get_feature_vector(word, dictionary, previous_tags) for word in window])		
 	return quintet
 
 def create_window(token_number, tokens):

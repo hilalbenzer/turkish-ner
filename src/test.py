@@ -25,6 +25,7 @@ with open('reyyan.test.txt','r',encoding='utf-8',errors="ignore") as f:
 		print("Line: " + str(line_count) + "/" + str(2750))
 		tokens = line.split()
 		current_entity_type = ""
+		previous_tags = [0, 0]
 		for token_number, token in enumerate(tokens):
 			# Default encoding is O
 			current_position = Util.position_O
@@ -55,7 +56,10 @@ with open('reyyan.test.txt','r',encoding='utf-8',errors="ignore") as f:
 
 			window = Util.create_window(token_number, tokens)
 
-			classFound = find_class(Util.create_quintet(window, dicMap))
+			classFound = find_class(Util.create_quintet(window, dicMap, previous_tags))
+
+			previous_tags = [previous_tags[1], classFound]
+
 			found_class.append(Util.find_recognition_string(classFound))
 
 actual_class_BIO = Util.change_to_BIO(actual_class)

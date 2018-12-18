@@ -18,6 +18,7 @@ with open('reyyan.train.txt', 'r', encoding="utf-8", errors="ignore") as f:
 		print(str(line_count) + "/" + str(24813) + " (" + str(batch_count) + ")")
 		tokens = line.split()
 		current_entity_type = ""
+		previous_tags = [0, 0]
 		for token_number, token in enumerate(tokens):
 			# Default encoding is O
 			current_position = Util.position_O
@@ -43,11 +44,15 @@ with open('reyyan.train.txt', 'r', encoding="utf-8", errors="ignore") as f:
 				else:
 					current_position = Util.position_I
 
-			recognition_array.append(Util.find_recognition_id(current_entity_type, current_position))
+			recognition_id = Util.find_recognition_id(current_entity_type, current_position)
+
+			recognition_array.append(recognition_id)
 
 			window = Util.create_window(token_number, tokens)
 			
-			quintet = Util.create_quintet(window, dicMap)
+			quintet = Util.create_quintet(window, dicMap, previous_tags)
+
+			previous_tags = [previous_tags[1], recognition_id]
 
 			feature_vector.append(quintet)
 

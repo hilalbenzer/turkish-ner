@@ -13,12 +13,11 @@ outputFile = "word2vec.model"
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
-sentences = []
 bounCorpusSentences = LineSentence(bounCorpusFile)
 newsCorpusSentences = LineSentence(newsCorpusFile)
-unknownSentence = ["<UNKNOWN>"]
+unknownSentence = LineSentence("unk.txt")
 
-model = Word2Vec(size=300, window=5, min_count=1, workers=multiprocessing.cpu_count(), iter = 1)
+model = Word2Vec(size=200, window=5, min_count=1, workers=multiprocessing.cpu_count(), iter = 1)
 
 model.build_vocab(unknownSentence, update=False)
 model.train(unknownSentence, total_examples=model.corpus_count, epochs=model.iter)
