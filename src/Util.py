@@ -1,5 +1,6 @@
 import numpy as np
 from gensim.models import KeyedVectors
+import sys
 
 position_B = "B"
 position_I = "I"
@@ -124,12 +125,11 @@ def create_window(token_number, tokens):
 	while window_count < 2:
 		if token_number - count < 0:
 			if token_number - count == -1:
-				window[2-count] = "<SEN-1>"
+				window[1-window_count] = "<SEN-1>"
 				window_count += 1
 			elif token_number - count == -2:
-				if token_number == 0:
-					window[0] = "<SEN-2>"
-					window_count += 1
+				window[0] = "<SEN-2>"
+				window_count += 1
 		elif check_valid_token(tokens[token_number - count]):
 			window[1-window_count] = tokens[token_number - count]
 			window_count += 1	
@@ -139,12 +139,11 @@ def create_window(token_number, tokens):
 	while window_count < 2:
 		if token_number + count > tokens_length - 1:
 			if token_number + count == tokens_length:
-				window[2+count] = "<SEN+1>"
+				window[1+window_count] = "<SEN+1>"
 				window_count += 1
 			elif token_number + count == tokens_length + 1:
-				if token_number == tokens_length - 1:
-					window[4] = "<SEN+2>"
-					window_count += 1
+				window[4] = "<SEN+2>"
+				window_count += 1
 		elif check_valid_token(tokens[token_number + count]):
 			window[3+window_count] = tokens[token_number + count]
 			window_count += 1	
