@@ -6,8 +6,8 @@ from gensim.models import Word2Vec
 from gensim.models.word2vec import LineSentence
  
 bounCorpusFile = "word2vec_corpus/bounwebcorpus.txt"
-# newsCorpusFile = "word2vec_corpus/newscor.txt"
 newsCorpusFile = "word2vec_corpus/newscor_digitless.txt"
+unknownFile = "word2vec_corpus/unk.txt"
 
 outputFile = "word2vec.model"
 
@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 bounCorpusSentences = LineSentence(bounCorpusFile)
 newsCorpusSentences = LineSentence(newsCorpusFile)
-unknownSentence = LineSentence("unk.txt")
+unknownSentence = LineSentence(unknownFile)
 
 model = Word2Vec(size=200, window=5, min_count=1, workers=multiprocessing.cpu_count(), iter = 1)
 
