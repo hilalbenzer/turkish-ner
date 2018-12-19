@@ -6,16 +6,16 @@ import Util
 
 model = MLPClassifier(hidden_layer_sizes=(), learning_rate_init=0.01)
 
-trainSetDirectory = 'corpus/reyyan.train.txt'
-dictionaryDirectory = 'dictionary.txt'
-modelDirectory = 'model.pkl'
+train_set_directory = 'corpus/reyyan.train.txt'
+dictionary_directory = 'dictionary.txt'
+model_directory = 'model.pkl'
 
-dicMap = Util.read_dictionary_from_file(dictionaryDirectory)
+dicMap = Util.read_dictionary_from_file(dictionary_directory)
 
 classes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12]
 batch_count = 0
 
-with open(trainSetDirectory, 'r', encoding="utf-8", errors="ignore") as f:
+with open(train_set_directory, 'r', encoding="utf-8", errors="ignore") as f:
 	recognition_array = []
 	feature_vector = []
 	for line_count, line in enumerate(f):
@@ -65,4 +65,4 @@ with open(trainSetDirectory, 'r', encoding="utf-8", errors="ignore") as f:
 			batch_count += 1
 			recognition_array = []
 			feature_vector = []	
-	joblib.dump(model, modelDirectory)
+	joblib.dump(model, model_directory)

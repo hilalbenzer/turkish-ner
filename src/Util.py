@@ -92,7 +92,8 @@ def get_feature_vector(word, dictionary, previous_tags):
 	# word2vec_feature = get_word2vec(word)
 	dict_feature = get_dict_lookup(word, dictionary)
 	# total_feature = np.concatenate((dict_feature, type_feature, word2vec_feature))
-	total_feature = np.concatenate((dict_feature, type_feature, previous_tags))
+	# total_feature = np.concatenate((dict_feature, type_feature, previous_tags))
+	total_feature = np.concatenate((dict_feature, type_feature))
 	return total_feature
 
 def create_quintet(window, dictionary, previous_tags):

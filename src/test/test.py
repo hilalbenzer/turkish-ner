@@ -7,32 +7,30 @@ from sklearn.metrics import classification_report
 from conlleval import evaluate
 import Util
 
-testSetDirectory = '../corpus/reyyan.test.txt'
-dictionaryDirectory = '../dictionary.txt'
-modelDirectory = '../model.pkl'
+test_set_directory = '../corpus/reyyan.test.txt'
+dictionary_directory = '../dictionary.txt'
+model_directory = '../model.pkl'
 
-model = joblib.load(modelDirectory)
+model = joblib.load(model_directory)
 
-dicMap = Util.read_dictionary_from_file(dictionaryDirectory)
+dicMap = Util.read_dictionary_from_file(dictionary_directory)
 
 actual_class = []
 found_class = []
 
 def find_class(quintet):
-	aBatch=[]
-	aBatch.append(quintet)
-	for i in range(13):
-		output = model.score(aBatch,[12-i])
-		if(output == 1):
-			return 12-i
+	result = model.predict([quintet])
+	return result
 
-with open(testSetDirectory,'r',encoding='utf-8',errors="ignore") as f:
+with open(test_set_directory,'r',encoding='utf-8',errors="ignore") as f:
 	for line_count, line in enumerate(f):
 		print("Line: " + str(line_count) + "/" + str(2750))
 		tokens = line.split()
 		current_entity_type = ""
 		previous_tags = [12, 12]
 		for token_number, token in enumerate(tokens):
+			if token == "":
+				continue
 			# Default encoding is O
 			current_position = Util.position_O
 			# If currently not on an entity
