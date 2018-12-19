@@ -6,19 +6,23 @@ import Util
 
 model = MLPClassifier(hidden_layer_sizes=(), learning_rate_init=0.01)
 
-dicMap = Util.read_dictionary_from_file('dictionary.txt')
+trainSetDirectory = 'corpus/reyyan.train.txt'
+dictionaryDirectory = 'dictionary.txt'
+modelDirectory = 'model.pkl'
+
+dicMap = Util.read_dictionary_from_file(dictionaryDirectory)
 
 classes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12]
 batch_count = 0
 
-with open('reyyan.train.txt', 'r', encoding="utf-8", errors="ignore") as f:
+with open(trainSetDirectory, 'r', encoding="utf-8", errors="ignore") as f:
 	recognition_array = []
 	feature_vector = []
 	for line_count, line in enumerate(f):
 		print(str(line_count) + "/" + str(24813) + " (" + str(batch_count) + ")")
 		tokens = line.split()
 		current_entity_type = ""
-		previous_tags = [0, 0]
+		previous_tags = [12, 12]
 		for token_number, token in enumerate(tokens):
 			# Default encoding is O
 			current_position = Util.position_O
@@ -61,4 +65,4 @@ with open('reyyan.train.txt', 'r', encoding="utf-8", errors="ignore") as f:
 			batch_count += 1
 			recognition_array = []
 			feature_vector = []	
-	joblib.dump(model, 'model.pkl')
+	joblib.dump(model, modelDirectory)

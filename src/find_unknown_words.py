@@ -1,3 +1,8 @@
+"""
+Finds words and word frequencies from train set that are not included in word2vec model
+For testing purposes
+"""
+
 import numpy as np
 from gensim.models import KeyedVectors
 import Util

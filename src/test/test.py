@@ -1,13 +1,19 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+import os, sys, inspect
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir) 
 from sklearn.externals import joblib
 from sklearn.metrics import classification_report
 from conlleval import evaluate
 import Util
 
-model = joblib.load('model.pkl')
+testSetDirectory = '../corpus/reyyan.test.txt'
+dictionaryDirectory = '../dictionary.txt'
+modelDirectory = '../model.pkl'
 
-dicMap = Util.read_dictionary_from_file('dictionary.txt')
+model = joblib.load(modelDirectory)
+
+dicMap = Util.read_dictionary_from_file(dictionaryDirectory)
 
 actual_class = []
 found_class = []
@@ -20,12 +26,12 @@ def find_class(quintet):
 		if(output == 1):
 			return 12-i
 
-with open('reyyan.test.txt','r',encoding='utf-8',errors="ignore") as f:
+with open(testSetDirectory,'r',encoding='utf-8',errors="ignore") as f:
 	for line_count, line in enumerate(f):
 		print("Line: " + str(line_count) + "/" + str(2750))
 		tokens = line.split()
 		current_entity_type = ""
-		previous_tags = [0, 0]
+		previous_tags = [12, 12]
 		for token_number, token in enumerate(tokens):
 			# Default encoding is O
 			current_position = Util.position_O

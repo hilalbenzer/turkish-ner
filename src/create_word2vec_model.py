@@ -1,3 +1,8 @@
+"""
+Creates word2vec model using bounCorpusFile + newsCorpusFile
+<UNKNOWN> pseudo word for unknown words in unk.txt
+"""
+
 import logging
 import sys
 import multiprocessing
