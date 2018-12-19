@@ -88,12 +88,13 @@ def get_feature_vector(word, dictionary, previous_tags):
 	Returns final feature vector of a single word after applying features
 	"""
 	word = replace_digit(word)
-	type_feature = get_word_type(word)
+	# type_feature = get_word_type(word)
 	# word2vec_feature = get_word2vec(word)
 	dict_feature = get_dict_lookup(word, dictionary)
 	# total_feature = np.concatenate((dict_feature, type_feature, word2vec_feature))
 	# total_feature = np.concatenate((dict_feature, type_feature, previous_tags))
-	total_feature = np.concatenate((dict_feature, type_feature))
+	# total_feature = np.concatenate((dict_feature, type_feature))
+	total_feature = dict_feature
 	return total_feature
 
 def create_quintet(window, dictionary, previous_tags):
@@ -124,12 +125,14 @@ def create_window(token_number, tokens):
 		if token_number - count < 0:
 			if token_number - count == -1:
 				window[2-count] = "<SEN-1>"
+				window_count += 1
 			elif token_number - count == -2:
 				if token_number == 0:
 					window[0] = "<SEN-2>"
+					window_count += 1
 		elif check_valid_token(tokens[token_number - count]):
 			window[1-window_count] = tokens[token_number - count]
-		window_count += 1	
+			window_count += 1	
 		count += 1
 	count = 1
 	window_count = 0
@@ -137,16 +140,17 @@ def create_window(token_number, tokens):
 		if token_number + count > tokens_length - 1:
 			if token_number + count == tokens_length:
 				window[2+count] = "<SEN+1>"
+				window_count += 1
 			elif token_number + count == tokens_length + 1:
 				if token_number == tokens_length - 1:
 					window[4] = "<SEN+2>"
+					window_count += 1
 		elif check_valid_token(tokens[token_number + count]):
 			window[3+window_count] = tokens[token_number + count]
-		window_count += 1	
+			window_count += 1	
 		count += 1
 
 	window[2] = tokens[token_number]
-
 	return window
 
 def find_recognition_id(rec, pos):
@@ -233,6 +237,8 @@ def check_valid_token(token):
 	elif token == "[PER":
 		return False
 	elif token == "]":
+		return False
+	elif token == "":
 		return False
 	else:
 		return True

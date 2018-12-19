@@ -14,3 +14,5 @@ src/word2vec.model
 
 src/__pycache__
 src/test/__pycache__
+.DS_Store
+src/.DS_Store
