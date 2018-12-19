@@ -1,0 +1,12 @@
+# Corpus #
+
+src/reyyan.test.txt
+src/reyyan.train.txt
+src/word2vec_corpus/bounwebcorpus.txt
+src/word2vec_corpus/newscor.txt
+src/word2vec_corpus/newscor_digitless.txt
+src/word2vec_corpus/unk.txt
+
+# Compiled models #
+
+src/word2vec.model
