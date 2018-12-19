@@ -1,20 +1,21 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+"""
+Creates dictionary
+Dict includes unique words and their ids
+"""
 from gensim.corpora import Dictionary
-import Util
 
 dictionary = Dictionary() 
 
-#file = open("testfile.txt","w") 
+def replace_digit(word):
+	if check_sentence_border(word):
+		return word
+	return "".join(["#" if char.isdigit() else char for char in word])
 
 with open('reyyan.train.txt', encoding="utf-8") as fp:
 	for line in fp:
-		
-		"""linex = line.replace('%', ' % ')
-		linex = linex.replace('.', ' . ')
-		linex = linex.replace('?', ' ? ')"""
+
 		tokens = line.split()
-		tokens = [Util.replace_digit(word) for word in tokens]
+		tokens = [replace_digit(word) for word in tokens]
 
 		dictionary.doc2bow(tokens, allow_update=True);
 

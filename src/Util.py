@@ -15,6 +15,10 @@ entity_type_ORG = "ORG"
 # word2vec_model = KeyedVectors.load_word2vec_format('word2vec.model', binary=True)
 
 def get_dict_lookup(word, dictionary):
+	"""
+	returns one hot encoded vector for word using id from dictionary
+	if not in dictionary returns "unknown"
+	"""
 	dic_length = len(dictionary) + 1
 	vector = np.zeros((dic_length,), dtype=int)
 	if word in dictionary:
@@ -24,6 +28,9 @@ def get_dict_lookup(word, dictionary):
 	return vector
 
 def get_word_type(word):
+	"""
+	returns word type feature vector for word
+	"""
 	vector = [0, 0, 0, 0, 0]
 	if word.islower():
 		vector[0] = 1
@@ -38,15 +45,26 @@ def get_word_type(word):
 	return vector
 
 def contains_apostrophe(word):
+	"""
+	returns true if word contains apostrophe
+	"""
 	return "\'" in word
 
 def is_digit(word):
+	"""
+	returns true if word contains only digit character
+	"""
 	for character in word:
 		if character != '#':
 			return False
 	return True
 
 def get_word2vec(word):
+	"""
+	returns word2vec vector of a word
+	if not in model, checks for a lowercased, uppercased or capitalized version and returns it
+	if versions not in model, returns embedding of unknown word
+	"""
 	if word in word2vec_model:
 		return word2vec_model[word]
 	elif word.lower() in word2vec_model:
@@ -58,11 +76,17 @@ def get_word2vec(word):
 	return word2vec_model["<UNKNOWN>"]
 
 def replace_digit(word):
+	"""
+	replaces all digits of the word with digit character and returns the word
+	"""
 	if check_sentence_border(word):
 		return word
 	return "".join(["#" if char.isdigit() else char for char in word])
 
 def get_feature_vector(word, dictionary, previous_tags):
+	"""
+	returns final feature vector of a single word after applying features
+	"""
 	word = replace_digit(word)
 	type_feature = get_word_type(word)
 	# word2vec_feature = get_word2vec(word)
@@ -72,10 +96,25 @@ def get_feature_vector(word, dictionary, previous_tags):
 	return total_feature
 
 def create_quintet(window, dictionary, previous_tags):
+	"""
+	applies features for all words in window
+	"""
 	quintet = np.concatenate([get_feature_vector(word, dictionary, previous_tags) for word in window])		
 	return quintet
 
 def create_window(token_number, tokens):
+	"""
+	given the token list and a token number, returns window of 2 for the word
+	adds pseudo-words for beginning and ending words
+
+	e.g.
+
+	tokens:
+	[first_word, second_word, ..., final_word]
+
+	window for first word:
+	["<SEN-2>", "<SEN-1>", first_word, second_word, third_word]
+	"""
 	window = ["", "", "", "", ""]
 	count = 1
 	window_count = 0
@@ -110,6 +149,15 @@ def create_window(token_number, tokens):
 	return window
 
 def find_recognition_id(rec, pos):
+	"""
+	returns recognition id given entity type and position
+
+	B-ORG = 0	I_ORG = 1	L-ORG = 2	U-ORG = 3
+	B-LOC = 4	I_LOC = 5	L-LOC = 6	U-LOC = 7
+	B-PER = 8	I_PER = 9	L-PER = 10	U-PER = 11
+	O = 12
+
+	"""
 	if rec == entity_type_ORG:
 		if pos == position_B:
 			return 0
@@ -141,6 +189,9 @@ def find_recognition_id(rec, pos):
 		return 12
 
 def find_recognition_string(rec):
+	"""
+	returns recognition string given a recognition id
+	"""
 	if rec == 12:
 		return "O"
 	elif rec == 0:
@@ -169,6 +220,11 @@ def find_recognition_string(rec):
 		return "U-PER"
 
 def check_valid_token(token):
+	"""
+	checks if the given token is a valid token
+	nonvalid tokens being entity tags in corpus
+	returns true if valid
+	"""
 	if token == "[LOC":
 		return False
 	elif token == "[ORG":
@@ -181,6 +237,9 @@ def check_valid_token(token):
 		return True
 
 def get_entity_type(token):
+	"""
+	returns the entity type given an entity tag
+	"""
 	if token == "[LOC":
 		return entity_type_LOC
 	elif token == "[ORG":
@@ -191,18 +250,27 @@ def get_entity_type(token):
 		return ""
 
 def is_beggining_tag(token):
+	"""
+	returns true if token given is beginning entity tag 
+	"""
 	if token == "[LOC" or token == "[ORG" or token == "[PER":
 		return True
 	else:
 		return False
 
 def is_ending_tag(token):
+	"""
+	returns true if token given is ending entity tag 
+	"""
 	if token == "]":
 		return True
 	else:
 		return False
 
 def change_to_BIO(BILOU_classes):
+	"""
+	maps and returns given list of BILOU tags to corresponding BIO tags
+	"""
 	BIO_classes = []
 	for tag in BILOU_classes:
 		if tag == 'L-ORG':
@@ -222,6 +290,9 @@ def change_to_BIO(BILOU_classes):
 	return BIO_classes
 
 def read_dictionary_from_file(filename):
+	"""
+	reads dictionary file and returns it as dict object
+	"""
 	tempMap = {}
 	dicMap = {}
 	with open(filename,'r',encoding="utf-8") as file:
@@ -231,6 +302,9 @@ def read_dictionary_from_file(filename):
 	return dicMap
 
 def check_sentence_border(word):
+	"""
+	returns true if given word is a pseudo word for sentence borders
+	"""
 	if word == '<SEN-2>' or word == '<SEN-1>' or word == '<SEN+1>' or word == '<SEN+2>':
 		return True
 	else:
