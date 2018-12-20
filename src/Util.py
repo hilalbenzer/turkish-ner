@@ -12,8 +12,8 @@ entity_type_LOC = "LOC"
 entity_type_PER = "PER"
 entity_type_ORG = "ORG"
 
-# print("Loading word2vec model...")
-# word2vec_model = KeyedVectors.load_word2vec_format('word2vec.model', binary=True)
+print("Loading word2vec model...")
+word2vec_model = KeyedVectors.load_word2vec_format('word2vec.model', binary=True)
 
 def get_dict_lookup(word, dictionary):
 	"""
@@ -84,18 +84,26 @@ def replace_digit(word):
 		return word
 	return "".join(["#" if char.isdigit() else char for char in word])
 
+def get_previous_tag_vector(previous_tags):
+	feature_vector = []
+	for tag in previous_tags:
+		vector = np.zeros((13,), dtype=int)
+		vector[tag] = 1
+		feature_vector = np.concatenate((feature_vector, vector))
+	return feature_vector
+
 def get_feature_vector(word, dictionary, previous_tags):
 	"""
 	Returns final feature vector of a single word after applying features
 	"""
 	word = replace_digit(word)
-	# type_feature = get_word_type(word)
-	# word2vec_feature = get_word2vec(word)
+
 	dict_feature = get_dict_lookup(word, dictionary)
-	# total_feature = np.concatenate((dict_feature, type_feature, word2vec_feature))
-	# total_feature = np.concatenate((dict_feature, type_feature, previous_tags))
-	# total_feature = np.concatenate((dict_feature, type_feature))
-	total_feature = dict_feature
+	type_feature = get_word_type(word)
+	previous_tag_feature = get_previous_tag_vector(previous_tags)
+	word2vec_feature = get_word2vec(word)
+	
+	total_feature = np.concatenate((dict_feature, type_feature, previous_tag_feature, word2vec_feature))
 	return total_feature
 
 def create_quintet(window, dictionary, previous_tags):

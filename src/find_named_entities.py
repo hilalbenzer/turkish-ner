@@ -11,6 +11,7 @@ if len(arguments) != 3:
 input_file = arguments[1]
 output_file = arguments[2]
 
+print("Reading model...")
 model_directory = 'model.pkl'
 dictionary_directory = 'dictionary.txt'
 
@@ -25,7 +26,9 @@ def find_class(quintet):
 	return result
 
 with open(input_file, 'r', encoding="utf-8", errors="ignore") as f:
+	print("Reading file...")
 	for line_count, line in enumerate(f):
+		print("Line ", line_count)
 		tokens = line.split()
 		previous_tags = [12, 12]
 		for token_number, token in enumerate(tokens):
@@ -33,10 +36,10 @@ with open(input_file, 'r', encoding="utf-8", errors="ignore") as f:
 			quintet = Util.create_quintet(window, dicMap, previous_tags)
 			classFound = find_class(quintet)
 			previous_tags = [previous_tags[1], classFound]
-			found_class.append(Util.find_recognition_string(classFound))
-			found_entity_token.append(token)
+			print(token, " \t\t ", Util.find_recognition_string(classFound))
+			# found_class.append(Util.find_recognition_string(classFound))
+			# found_entity_token.append(token)
 
 
-# for index, token in enumerate(found_entity_token):
-# 	print(token + "\t\t" + found_class[index])
-# 	a = 1
+for index, token in enumerate(found_entity_token):
+	print(token + "\t\t" + found_class[index])
