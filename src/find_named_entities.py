@@ -1,6 +1,9 @@
 import sys
 import Util
 from sklearn.externals import joblib
+import warnings
+
+warnings.filterwarnings("ignore")
 
 arguments = sys.argv
 
@@ -11,7 +14,6 @@ if len(arguments) != 3:
 input_file = arguments[1]
 output_file = arguments[2]
 
-print("Reading model...")
 model_directory = 'model.pkl'
 dictionary_directory = 'dictionary.txt'
 
@@ -55,9 +57,9 @@ for sentence in sentences:
 					token = token.replace(punc, "\"")
 				for punc in separate_both:
 					token = token.replace(punc, " "+punc+" ")
-				new_token = []
 				for punc in separate_left:
 					token = token.replace(punc, " "+punc)
+				new_token = []
 				for index in range(len(token)):
 					append = False
 					if token[index] in separate_nondigit:
@@ -90,8 +92,12 @@ for line_count, line in enumerate(processed_sentences):
 	found_class.append(temp_class)
 	found_entity_token.append(temp_token)
 
+named_entities = []
+
 with open(output_file, 'w', encoding="utf-8", errors="ignore") as f:
 	for sentence_index, sentence in enumerate(found_entity_token):
+		current_entity = ""
+		current_entity_type = ""
 		for token_index, token in enumerate(sentence):
 			f.write(token)
 			f.write(" ")
@@ -100,4 +106,31 @@ with open(output_file, 'w', encoding="utf-8", errors="ignore") as f:
 				f.write("[")
 				f.write(word_class)
 				f.write("] ")
+				if "U-" in word_class:
+					if "LOC" in word_class:
+						named_entities.append((token, "Location"))
+					elif "PER" in word_class:
+						named_entities.append((token, "Person"))
+					elif "ORG" in word_class:
+						named_entities.append((token, "Organization"))
+				elif "B-" in word_class:
+					current_entity = current_entity + token + " "
+					if "LOC" in word_class:
+						current_entity_type = "Location"
+					elif "PER" in word_class:
+						current_entity_type = "Person"
+					elif "ORG" in word_class:
+						current_entity_type = "Organization"
+				elif "I-" in word_class:
+					current_entity = current_entity + token + " "
+				elif "L-" in word_class:
+					current_entity = current_entity + token + " "
+					named_entities.append((current_entity, current_entity_type))
+					current_entity = ""
+					current_entity_type = ""
 		f.write("\n")
+
+for entity, entity_type in named_entities:
+	print(entity)
+	print(entity_type)
+	print("\n")
