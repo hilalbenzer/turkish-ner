@@ -1,3 +1,6 @@
+"""
+For testing purposes
+"""
 import os, sys, inspect
 from sklearn.externals import joblib
 from sklearn.metrics import classification_report
