@@ -25,21 +25,79 @@ def find_class(quintet):
 	result = model.predict([quintet])
 	return result
 
+sentences = ""
+terminal = [".", "?", "...", "!", "…"]
+separate_both = [",", "/", "\"", "(", ")", "?", "!", "…", ";", "%", "#", "$", "=", "@", "+", "&"]
+separate_nondigit = [".", ":"]
+separate_left = ["\'"]
+unwanted_apostrophe = ["`", "´", "‘", "’"]
+unwanted_quote = ["“", "”"]
+remove = ["[", "]"]
+
 with open(input_file, 'r', encoding="utf-8", errors="ignore") as f:
-	print("Reading file...")
-	for line_count, line in enumerate(f):
-		print("Line ", line_count)
-		tokens = line.split()
-		previous_tags = [12, 12]
-		for token_number, token in enumerate(tokens):
-			window = Util.create_window(token_number, tokens)
-			quintet = Util.create_quintet(window, dicMap, previous_tags)
-			classFound = find_class(quintet)
-			previous_tags = [previous_tags[1], classFound]
-			print(token, " \t\t ", Util.find_recognition_string(classFound))
-			# found_class.append(Util.find_recognition_string(classFound))
-			# found_entity_token.append(token)
+	sentences = f.read().split("\n")
 
+processed_sentences = []
+for sentence in sentences:
+	tokens = sentence.split()
+	temp_sentence = []
+	for token_index, token in enumerate(tokens):
+		if token_index == len(tokens) - 1:
+			for punc in terminal:
+				token = token.replace(punc, '')
+			if token != "":
+				temp_sentence.append(token)
+		else:
+			if token != "":
+				for punc in unwanted_apostrophe:
+					token = token.replace(punc, "\'")
+				for punc in unwanted_quote:
+					token = token.replace(punc, "\"")
+				for punc in separate_both:
+					token = token.replace(punc, " "+punc+" ")
+				new_token = []
+				for punc in separate_left:
+					token = token.replace(punc, " "+punc)
+				for index in range(len(token)):
+					append = False
+					if token[index] in separate_nondigit:
+						if index != 0 and not token[index-1].isdigit():
+							new_token.append(" ")
+						if index != len(token)-1 and not token[index+1].isdigit():
+							append = True
+					new_token.append(token[index])
+					if append:
+						new_token.append(" ")
+				token = "".join(new_token)
+				if token != "":
+					temp_sentence.append(token)
+	processed_sentences.append(" ".join(temp_sentence))
 
-for index, token in enumerate(found_entity_token):
-	print(token + "\t\t" + found_class[index])
+for line_count, line in enumerate(processed_sentences):
+	if line == "":
+		continue
+	tokens = line.split()
+	previous_tags = [12, 12]
+	temp_class = []
+	temp_token = []
+	for token_number, token in enumerate(tokens):
+		window = Util.create_window(token_number, tokens)
+		quintet = Util.create_quintet(window, dicMap, previous_tags)
+		classFound = find_class(quintet)
+		previous_tags = [previous_tags[1], classFound]
+		temp_class.append(Util.find_recognition_string(classFound))
+		temp_token.append(token)
+	found_class.append(temp_class)
+	found_entity_token.append(temp_token)
+
+with open(output_file, 'w', encoding="utf-8", errors="ignore") as f:
+	for sentence_index, sentence in enumerate(found_entity_token):
+		for token_index, token in enumerate(sentence):
+			f.write(token)
+			f.write(" ")
+			word_class = found_class[sentence_index][token_index]
+			if word_class != 'O':
+				f.write("[")
+				f.write(word_class)
+				f.write("] ")
+		f.write("\n")

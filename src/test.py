@@ -1,15 +1,12 @@
 import os, sys, inspect
-current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parent_dir = os.path.dirname(current_dir)
-sys.path.insert(0, parent_dir) 
 from sklearn.externals import joblib
 from sklearn.metrics import classification_report
 from conlleval import evaluate
 import Util
 
-test_set_directory = '../corpus/reyyan.test.txt'
-dictionary_directory = '../dictionary.txt'
-model_directory = '../model.pkl'
+test_set_directory = 'corpus/reyyan.test.txt'
+dictionary_directory = 'dictionary.txt'
+model_directory = 'model.pkl'
 
 model = joblib.load(model_directory)
 
