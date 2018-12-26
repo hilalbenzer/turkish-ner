@@ -14,7 +14,7 @@ unknown_word_count = 0
 
 unknown_words = {}  
 
-with open('reyyan.train.txt', 'r', encoding="utf-8", errors="ignore") as f:
+with open('corpus/reyyan.train.txt', 'r', encoding="utf-8", errors="ignore") as f:
 	for line_count, line in enumerate(f):
 		tokens = line.split()
 		current_entity_type = ""
