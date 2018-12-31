@@ -1,26 +1,30 @@
-import sys
-import Util
+from . import Util
 from sklearn.externals import joblib
 import warnings
 
 warnings.filterwarnings("ignore")
 
-arguments = sys.argv
 
-if len(arguments) != 3:
-	print("Usage: python3 find_named_entities <input_file> <output_file>")
-	sys.exit(0)
-
-input_file = arguments[1]
-output_file = arguments[2]
-
-model_directory = 'model.pkl'
-dictionary_directory = 'dictionary.txt'
+model_directory = 'src/model.pkl'
+dictionary_directory = 'src/dictionary.txt'
 
 model = joblib.load(model_directory)
 dicMap = Util.read_dictionary_from_file(dictionary_directory)
 
-sentences = ""
+location_color = "#0584F2"
+person_color = "#EDF259"
+organization_color = "#ABA6BF"
+
+colors = {"Location": location_color, "Person": person_color, "Organization": organization_color}
+
+def get_annotated_text(entity, entity_type):
+	annotated_text = ""
+	annotated_text += "<b><span style=\"background-color: "
+	annotated_text += colors[entity_type]
+	annotated_text += "\">"
+	annotated_text += entity
+	annotated_text += "</span></b> "
+	return annotated_text
 
 def find_classes(sentences):
 	"""
@@ -47,34 +51,26 @@ def find_classes(sentences):
 		found_entity_token.append(temp_token)
 	return found_class, found_entity_token
 
-with open(input_file, 'r', encoding="utf-8", errors="ignore") as f:
-	sentences = f.read().split("\n")
-
-processed_sentences = Util.apply_preprocessing()
-
-found_class, found_entity_token = find_classes(processed_sentences)
-
-named_entities = []
-
-with open(output_file, 'w', encoding="utf-8", errors="ignore") as f:
+def run_ner(raw_text):
+	sentences = raw_text.split("\n")
+	processed_sentences = Util.apply_preprocessing(sentences)
+	found_class, found_entity_token = find_classes(processed_sentences)
+	output = "<p style=\"font-size:14px\"><font face=\"verdana\">"
 	for sentence_index, sentence in enumerate(found_entity_token):
 		current_entity = ""
 		current_entity_type = ""
 		for token_index, token in enumerate(sentence):
-			f.write(token)
-			f.write(" ")
 			word_class = found_class[sentence_index][token_index]
 			if word_class != Util.position_O:
-				f.write("[")
-				f.write(word_class)
-				f.write("] ")
 				if "U-" in word_class:
+					entity = ""
 					if Util.entity_type_LOC in word_class:
-						named_entities.append((token, "Location"))
+						entity = "Location"
 					elif Util.entity_type_PER in word_class:
-						named_entities.append((token, "Person"))
+						entity = "Person"
 					elif Util.entity_type_ORG in word_class:
-						named_entities.append((token, "Organization"))
+						entity = "Organization"
+					output += get_annotated_text(token, entity)
 				elif "B-" in word_class:
 					current_entity = current_entity + token + " "
 					if Util.entity_type_LOC in word_class:
@@ -87,12 +83,12 @@ with open(output_file, 'w', encoding="utf-8", errors="ignore") as f:
 					current_entity = current_entity + token + " "
 				elif "L-" in word_class:
 					current_entity = current_entity + token + " "
-					named_entities.append((current_entity, current_entity_type))
+					output += get_annotated_text(current_entity, current_entity_type)
 					current_entity = ""
 					current_entity_type = ""
-		f.write("\n")
-
-for entity, entity_type in named_entities:
-	print(entity)
-	print(entity_type)
-	print("\n")
+			else:
+				output += token
+				output += " "
+		output += "<br>"
+	output += "</font></p>"
+	return output

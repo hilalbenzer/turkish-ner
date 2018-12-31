@@ -1,0 +1,40 @@
+textarea {
+	border-radius: 10px;
+	font: 14px 'Verdana', sans-serif;
+}
+
+textarea:focus{
+	outline: none;
+	border: 1px solid #ba68c8;
+	box-shadow: 0 0 0 0.2rem rgba(186, 104, 200, .25);
+}
+
+iframe{
+	border-radius: 10px;
+}
+
+input {
+	display: inline;
+	width: 100px;
+	margin: 10px 100px 10px 10px;
+	padding: 10px;
+	border: none;
+	border-radius: 6px;
+	color: #fff;
+	background-color: #74637f;
+	font: 18px 'Opens Sans', sans-serif;
+	letter-spacing: 1px;
+	appearance: none;
+	cursor: pointer;
+}
+
+.label {
+	margin: 0 10px 0 0;
+	color: white;
+	padding: 8px;
+	font: 14px 'Verdana', sans-serif;
+}
+
+.person {background-color: #EDF259;}
+.location {background-color: #0584F2;} 
+.organization {background-color: #ABA6BF;} 

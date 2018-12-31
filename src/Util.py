@@ -12,6 +12,14 @@ entity_type_LOC = "LOC"
 entity_type_PER = "PER"
 entity_type_ORG = "ORG"
 
+terminal = [".", "?", "...", "!", "…"]
+separate_both = [",", "/", "\"", "(", ")", "?", "!", "…", ";", "%", "#", "$", "=", "@", "+", "&"]
+separate_nondigit = [".", ":"]
+separate_left = ["\'"]
+unwanted_apostrophe = ["`", "´", "‘", "’"]
+unwanted_quote = ["“", "”"]
+remove = ["[", "]"]
+
 # print("Loading word2vec model...")
 # word2vec_model = KeyedVectors.load_word2vec_format('word2vec.model', binary=True)
 
@@ -336,3 +344,56 @@ def check_sentence_border(word):
 		return True
 	else:
 		return False
+
+def apply_preprocessing(sentences):
+	"""
+	Applies preprocessing to raw text
+	Returns processed sentences
+	"""
+	processed_sentences = []
+	for sentence in sentences:
+		# Acquire tokens
+		tokens = sentence.split()
+		temp_sentence = []
+		for token_index, token in enumerate(tokens):
+			# If token is the last token in sentence, get rid of punctuation
+			# Since train/test sets do not contain . ? ! in the end of the sentences
+			if token_index == len(tokens) - 1:
+				for punc in terminal:
+					token = token.replace(punc, '')
+				if token != "":
+					temp_sentence.append(token)
+			else:
+				if token != "":
+					# Remove these characters
+					for punc in remove:
+						token = token.replace(punc, '')
+					# Convert different types of apostrophe into single '
+					for punc in unwanted_apostrophe:
+						token = token.replace(punc, "\'")
+					# Convert different types of quote into single "
+					for punc in unwanted_quote:
+						token = token.replace(punc, "\"")
+					# Separate these characters from tokens at both sides
+					for punc in separate_both:
+						token = token.replace(punc, " "+punc+" ")
+					# Separate these characters from tokens at left only
+					for punc in separate_left:
+						token = token.replace(punc, " "+punc)
+					new_token = []
+					# Separate these characters from sides that are not digits
+					for index in range(len(token)):
+						append = False
+						if token[index] in separate_nondigit:
+							if index != 0 and not token[index-1].isdigit():
+								new_token.append(" ")
+							if index != len(token)-1 and not token[index+1].isdigit():
+								append = True
+						new_token.append(token[index])
+						if append:
+							new_token.append(" ")
+					token = "".join(new_token)
+					if token != "":
+						temp_sentence.append(token)
+		processed_sentences.append(" ".join(temp_sentence))
+	return processed_sentences

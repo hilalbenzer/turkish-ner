@@ -1,7 +1,8 @@
 from bottle import route, run, template
 from bottle import request
 from bottle import redirect
-import find_named_entities
+from bottle import static_file
+from src import web_script
 
 @route('/')
 def index():
@@ -11,8 +12,11 @@ def index():
 def submit():
 	print(request)
 	text = request.params.comments
-	# package = str(request.GET.get('comments'))
-	output = find_named_entities.run_ner(text)
+	output = web_script.run_ner(text)
 	return output
 
-run(host='localhost', port=8075)
+@route('/src/<filename:path>')
+def fileget(filename):
+	return static_file(filename, root='./src/')
+
+run(host='localhost', port=8095)
