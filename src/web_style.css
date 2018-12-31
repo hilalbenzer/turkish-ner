@@ -38,3 +38,10 @@ input {
 .person {background-color: #EDF259;}
 .location {background-color: #0584F2;} 
 .organization {background-color: #ABA6BF;} 
+
+.title {
+	color: #74637f;
+	font: 24px 'Verdana', sans-serif;
+	margin-left: 20px;
+	margin-right: 20px;
+}
