@@ -82,8 +82,9 @@ def run_ner(raw_text):
 				elif "I-" in word_class:
 					current_entity = current_entity + token + " "
 				elif "L-" in word_class:
-					current_entity = current_entity + token + " "
+					current_entity = current_entity + token
 					output += get_annotated_text(current_entity, current_entity_type)
+					output += " "
 					current_entity = ""
 					current_entity_type = ""
 			else:
