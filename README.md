@@ -40,3 +40,7 @@ To create a new model
 To run the tests
 
 ``` python3 src/test.py ```
+
+### Acknowledgments
+
+* **CoNLL** evaluation code from GitHub repository [conlleval](https://github.com/sighsmile/conlleval)
